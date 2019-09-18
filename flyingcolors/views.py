@@ -31,3 +31,13 @@ def observations_page():
         observations += "<br>"
     return observations
 
+@app.route('/db_fancy')
+def test1_page_fancy():
+    sql_query = """ Select date, count(*) from observations_table where butterfly_id='0' group by date order by date """;
+    query_results = pd.read_sql_query(sql_query,con)
+    tabledata = ""
+    query_results=pd.read_sql_query(sql_query,con)
+    tabledata = []
+    for i in range(0,query_results.shape[0]):
+        tabledata.append(dict(date=query_results.iloc[i]['date'], count=query_results.iloc[i]['count']))
+    return render_template('test1.html',tabledata=tabledata)
