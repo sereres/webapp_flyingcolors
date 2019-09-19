@@ -1,9 +1,11 @@
 from flask import render_template
+from flask import request
 from flyingcolors import app
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 import pandas as pd
 import psycopg2
+import pickle
 
 user = 'postgres'
 host = 'localhost'
@@ -11,6 +13,30 @@ dbname = 'observations'
 db = create_engine('postgres://%s%s/%s' %(user,host,dbname))
 con = None
 con = psycopg2.connect(database = dbname, user = user)
+
+def returnvalue():
+    pk1_file3 = open('flyingcolors/butterfly_model.pck1','rb')
+    model = pickle.load(pk1_file3)
+    future = model.make_future_dataframe(periods=365)
+
+    pk1_file1 = open('flyingcolors/butterfly_forecast.pck1','rb')
+    butterfly_forecast = pickle.load(pk1_file1)
+    butterfly_variable = 0
+    print(butterfly_forecast.loc[butterfly_forecast['ds'] == '2019-10-14'])
+    for i in butterfly_forecast.loc[butterfly_forecast['ds']== '2019-10-14']['yhat']:
+        butterfly_variable = i
+        print("butterfly_variable")
+        print(i)
+    fig = model.plot(butterfly_forecast)
+    fig.savefig("forecast.png")
+
+    pk1_file2 = open('flyingcolors/dragonfly_forecast.pck1','rb')
+    dragonfly_forecast = pickle.load(pk1_file2)
+    dragonfly_variable = 0
+    #for i in dragonfly_forecast.loc[butterfly_forecast['ds']== '2019-10-14']['yhat']:
+    #    dragonfly_variable = i
+
+    return butterfly_variable
 
 @app.route('/')
 @app.route('/index')
@@ -41,3 +67,24 @@ def test1_page_fancy():
     for i in range(0,query_results.shape[0]):
         tabledata.append(dict(date=query_results.iloc[i]['date'], count=query_results.iloc[i]['count']))
     return render_template('test1.html',tabledata=tabledata)
+
+@app.route('/input')
+def observations_input():
+    return render_template("input.html")
+
+@app.route('/output')
+def observations_output():
+    #pull 'date' from input field and store it
+    observe_date = request.args.get('date')
+    #get the count of observations from the date
+    print(observe_date)
+    query = "SELECT date, count(*) from observations_table where butterfly_id='0' and date='%s' group by date order by date" %observe_date
+    print(query)
+    query_results = pd.read_sql_query(query,con)
+    print(query_results)
+    data = []
+    the_result = returnvalue()
+    for i in range(0,query_results.shape[0]):
+        data.append(dict(date=query_results.iloc[i]['date'],count=query_results.iloc[i]['count']))
+    return render_template("output.html", data=data, the_result=the_result)
+
