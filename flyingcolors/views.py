@@ -14,7 +14,7 @@ db = create_engine('postgres://%s%s/%s' %(user,host,dbname))
 con = None
 con = psycopg2.connect(database = dbname, user = user)
 
-def returnvalue():
+def returnvalue_butterfly(date):
     pk1_file3 = open('flyingcolors/butterfly_model.pck1','rb')
     model = pickle.load(pk1_file3)
     future = model.make_future_dataframe(periods=365)
@@ -22,21 +22,29 @@ def returnvalue():
     pk1_file1 = open('flyingcolors/butterfly_forecast.pck1','rb')
     butterfly_forecast = pickle.load(pk1_file1)
     butterfly_variable = 0
-    print(butterfly_forecast.loc[butterfly_forecast['ds'] == '2019-10-14'])
-    for i in butterfly_forecast.loc[butterfly_forecast['ds']== '2019-10-14']['yhat']:
+    print(butterfly_forecast.loc[butterfly_forecast['ds'] == date])
+    for i in butterfly_forecast.loc[butterfly_forecast['ds']== date]['yhat']:
         butterfly_variable = i
         print("butterfly_variable")
         print(i)
     fig = model.plot(butterfly_forecast)
     fig.savefig("forecast.png")
+    return butterfly_variable
 
+def returnvalue_dragonfly(date):
+    print("dragonflydate")
+    print(date)
     pk1_file2 = open('flyingcolors/dragonfly_forecast.pck1','rb')
     dragonfly_forecast = pickle.load(pk1_file2)
     dragonfly_variable = 0
-    #for i in dragonfly_forecast.loc[butterfly_forecast['ds']== '2019-10-14']['yhat']:
-    #    dragonfly_variable = i
+    print(dragonfly_forecast.loc[dragonfly_forecast['ds'] == date])
+    for i in dragonfly_forecast.loc[dragonfly_forecast['ds']== date]['yhat']:
+        dragonfly_variable = i
+        print("dragonfly_variable")
+        print(dragonfly_variable)
+    return dragonfly_variable
 
-    return butterfly_variable
+
 
 @app.route('/')
 @app.route('/index')
@@ -83,8 +91,11 @@ def observations_output():
     query_results = pd.read_sql_query(query,con)
     print(query_results)
     data = []
-    the_result = returnvalue()
+    the_result = returnvalue_butterfly(observe_date)
+    dragonfly_result = returnvalue_dragonfly(observe_date)
+    print(dragonfly_result)
+
     for i in range(0,query_results.shape[0]):
         data.append(dict(date=query_results.iloc[i]['date'],count=query_results.iloc[i]['count']))
-    return render_template("output.html", data=data, the_result=the_result)
+    return render_template("output.html", data=data, the_result=the_result, dragonfly_result=dragonfly_result)
 
