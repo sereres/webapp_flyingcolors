@@ -95,7 +95,17 @@ def observations_output():
     dragonfly_result = returnvalue_dragonfly(observe_date)
     print(dragonfly_result)
 
+    prevalent_species = "boo"
+    habitat_preference = "foo"
+
+    if dragonfly_result > the_result:
+        prevalent_species = "dragonflies"
+        habitat_preference = " places near water, streambanks, ponds, and riverbanks"
+    else:
+        prevalent_species = "butterflies"
+        habitat_preference = " places near large meadows of flowers and flowering trees"
+
     for i in range(0,query_results.shape[0]):
         data.append(dict(date=query_results.iloc[i]['date'],count=query_results.iloc[i]['count']))
-    return render_template("output.html", data=data, the_result=the_result, dragonfly_result=dragonfly_result)
+    return render_template("output.html", data=data, the_result=the_result, dragonfly_result=dragonfly_result, prevalent_species=prevalent_species, habitat_preference=habitat_preference)
 
