@@ -80,8 +80,41 @@ def test1_page_fancy():
 def observations_input():
     return render_template("input.html")
 
+@app.route('/input_simple')
+def observations_input_simple():
+    return render_template("input_simple.html")
+
 @app.route('/output')
 def observations_output():
+    #pull 'date' from input field and store it
+    observe_date = request.args.get('date')
+    #get the count of observations from the date
+    print(observe_date)
+    query = "SELECT date, count(*) from observations_table where butterfly_id='0' and date='%s' group by date order by date" %observe_date
+    print(query)
+    query_results = pd.read_sql_query(query,con)
+    print(query_results)
+    data = []
+    the_result = returnvalue_butterfly(observe_date)
+    dragonfly_result = returnvalue_dragonfly(observe_date)
+    print(dragonfly_result)
+
+    prevalent_species = "boo"
+    habitat_preference = "foo"
+
+    if dragonfly_result > the_result:
+        prevalent_species = "dragonflies"
+        habitat_preference = " places near water, streambanks, ponds, and riverbanks"
+    else:
+        prevalent_species = "butterflies"
+        habitat_preference = " places near large meadows of flowers and flowering trees"
+
+    for i in range(0,query_results.shape[0]):
+        data.append(dict(date=query_results.iloc[i]['date'],count=query_results.iloc[i]['count']))
+    return render_template("output.html", data=data, the_result=the_result, dragonfly_result=dragonfly_result, prevalent_species=prevalent_species, habitat_preference=habitat_preference)
+
+@app.route('/output_simple')
+def observations_output_simple():
     #pull 'date' from input field and store it
     observe_date = request.args.get('date')
     #get the count of observations from the date

@@ -45,32 +45,67 @@
 
 <br><br>
 
-<div clas = "container">
-	<div clas="starter-template">
-		<h2>Flying Colors User Interface</h2>
-	</div>
-	<div class = "container">
-		<form action="/output" method="GET">
-			<div class="form-group">
-				<label for="date">Observation Date:</label>
-				<input type="text" id="date" name='date' placeholder="e.g. 2019-09-10")>
-			</div>
-			<div class="form-group">
-				<label for="date">User's Address:</label>
-				<input type="text" id="address" name='address' placeholder="e.g. 300 W 60th St, Westmont, IL")>
-			</div>
-			<div>
-				<button type="submit" class="btn btn-default btn-lg">How many butterflies to expect?</button>
-			</div>
-		</form>
-	</div>
+ <div class="container">
+    <div class="starter-template">
+        <h2>Output Page</h2>
+        <p>Enter some user input</p>
+    </div>
 
-	<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-	<script src="../static/js/bootstrap.min.js"></script>
-</div><!-- /.container-->
+    <div class = "container">
+
+      <form  action="/output" method="GET">
+        <div class="form-group">
+          <label for="observation_date">Date you will observe:</label>
+          <input type="text" id="observation_date" name='observation_date' placeholder="e.g. ">
+        </div>
+        <div>
+          <button type="submit" class="btn btn-default btn-lg">GetPrediction</button>
+        </div>
+      </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+
+  </div> <!-- /.container-->
+
+    <div class="container">
+      <div class="starter-template">
+        <h3>Database Results:</h3>
+        <p class="lead">You have specified a specific date. <br> The following shows the observed dragonfly sighting count on that date. </p>
+      </div>
+
+      <table class="table table-hover">
+      <tr><th>Date</th><th>Count</th></tr>
+      {% for datapiece in data %}
+      <tr><td>{{ datapiece['date'] }}</td><td>{{ datapiece['count']}}</td></tr>
+      {% endfor %}
+      </table>
 
 
-<!-- Bootstrap core JavaScript
+     </div><!-- /.container -->
+
+    <div class="container">
+      <div class="starter-template">
+        <h3>Butterfly Result:</h3>
+        <p class="lead">The following uses the model of dragonfly abundance to give an estimated prevalence on the specified date: <br>The result is {{the_result}}</p>
+      </div>
+        <h3>Dragonfly Result:</h3>
+        <p class="lead">The following uses the model of dragonfly abundance to give an estimated prevalence on the specified date: <br>The result is {{dragonfly_result}}</p>
+      </div>
+
+      </div>
+        <h3>Recommendation:</h3>
+        <p class="lead">The more prevalent species in your area on the specified date is {{prevalent_species}}. The habitat {{prevalent_species}} prefer is {{habitat_preference}}, so seek out areas like that.</p>
+      </div>
+
+
+      <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+      <script src="../static/js/bootstrap.min.js"></script>
+
+
+     </div><!-- /.container -->
+
+    <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
