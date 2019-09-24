@@ -132,6 +132,7 @@ def observations_output():
     #millenium_park_count_test.head()
 
     parkcount = []
+    parknumber = 0
 
     for park in jparks['results']:
         #print(park)
@@ -140,12 +141,41 @@ def observations_output():
         print(park['name'])
         dragonfly_query = """select count(*) from observations_table where lattitude < {} and lattitude > {} and longitude < {} and longitude > {} and butterfly_id='0'""".format(park_ne['lat'],park_sw['lat'],park_ne['lng'],park_sw['lng'])
         butterfly_query = """select count(*) from observations_table where lattitude < {} and lattitude > {} and longitude < {} and longitude > {} and dragonfly_id='0'""".format(park_ne['lat'],park_sw['lat'],park_ne['lng'],park_sw['lng'])
-        dragonfly_count = pd.read_sql_query(dragonfly_query,con)
-        butterfly_count = pd.read_sql_query(butterfly_query,con)
+        dragonflies = pd.read_sql_query(dragonfly_query,con)
+        butterflies = pd.read_sql_query(butterfly_query,con)
+        butterfly_count = 0
+        dragonfly_count = 0
+        for i in butterflies['count']:
+            butterfly_count = i
+        for i in dragonflies['count']:
+            dragonfly_count = i
+
         print("butterfly count in park query")
         print(butterfly_count)
         print("dragonfly count in park query")
         print(dragonfly_count)
+        entry = tuple((parknumber,dragonfly_count,butterfly_count,park['name']))
+        parkcount.append(entry)
+        parknumber = parknumber + 1
+
+    print("parkcount sorted ")
+    print(parkcount)
+
+    #the below is how to sort a tuple based on the index key. for dragonfly sort, use 1, for butterfly sort, use 2.
+    #sorts in increasing order though.
+    #sorted(tuples, key = last) 
+    sorted_butterfly_increasing = sorted(parkcount,key = lambda x: x[2])
+    sorted_dragonfly_increasing = sorted(parkcount,key = lambda x: x[1])
+    print("parkcount sorted ")
+    print(sorted_butterfly_increasing)
+
+    #new_tup = tuples[::-1] supposedly reverses a tuple? because the third argument is the step size, which is negative here
+    sorted_butterfly = sorted_butterfly_increasing[::-1]
+    sorted_dragonfly = sorted_dragonfly_increasing[::-1]
+
+    print("parkcount decreasing ")
+    print(sorted_butterfly)
+
 
     query = "SELECT date, count(*) from observations_table where butterfly_id='0' and date='%s' group by date order by date" %observe_date
     print(query)
@@ -158,11 +188,20 @@ def observations_output():
 
     prevalent_species = "boo"
     habitat_preference = "foo"
+    parkname1 = "first placeholder"
+    parkname2 = "second placeholder"
+    parkname3 = "third placeholder"
 
     if dragonfly_result > the_result:
+        parkname1 = sorted_dragonfly[0][3]
+        parkname2 = sorted_dragonfly[1][3]
+        parkname3 = sorted_dragonfly[2][3]
         prevalent_species = "dragonflies"
         habitat_preference = " places near water, streambanks, ponds, and riverbanks"
     else:
+        parkname1 = sorted_butterfly[0][3]
+        parkname2 = sorted_butterfly[1][3]
+        parkname3 = sorted_butterfly[2][3]
         prevalent_species = "butterflies"
         habitat_preference = " places near large meadows of flowers and flowering trees"
 
@@ -176,7 +215,7 @@ def observations_output_simple():
     observe_date = request.args.get('date')
     #get the count of observations from the date
     print(observe_date)
-    query = "SELECT date, count(*) from observations_table where butterfly_id='0' and date='%s' group by date order by date" %observe_date
+    query = "SELECT date, count(*) from observations_table where date='%s' group by date order by date" %observe_date
     print(query)
     query_results = pd.read_sql_query(query,con)
     print(query_results)
