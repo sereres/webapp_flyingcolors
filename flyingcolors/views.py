@@ -100,7 +100,7 @@ def observations_output():
     with open('flyingcolors/apikey1.txt', 'r') as file:
         apikey_places = file.read()
 
-    apikey_places = []
+    apikey_geocode = []
     with open('flyingcolors/apikey2.txt', 'r') as file:
         apikey_geocode = file.read()
 
@@ -133,16 +133,19 @@ def observations_output():
 
     parkcount = []
 
-    for park in j['results']:
+    for park in jparks['results']:
         #print(park)
         park_ne = park['geometry']['viewport']['northeast']
         park_sw = park['geometry']['viewport']['southwest']
         print(park['name'])
-        dragonfly_query = """select count(*) from observations_table where lattitude < {} and 
-    #lattitude > {} and longitude < {} and longitude > {} and butterfly_id='0'""".format(park_ne['lat'],park_sw['lat'],park_ne['lng'],park_sw['lng'])
-        butterfly_query = """select count(*) from observations_table where lattitude < {} and 
-    #lattitude > {} and longitude < {} and longitude > {} and dragonfly_id='0'""".format(park_ne['lat'],park_sw['lat'],park_ne['lng'],park_sw['lng'])
-
+        dragonfly_query = """select count(*) from observations_table where lattitude < {} and lattitude > {} and longitude < {} and longitude > {} and butterfly_id='0'""".format(park_ne['lat'],park_sw['lat'],park_ne['lng'],park_sw['lng'])
+        butterfly_query = """select count(*) from observations_table where lattitude < {} and lattitude > {} and longitude < {} and longitude > {} and dragonfly_id='0'""".format(park_ne['lat'],park_sw['lat'],park_ne['lng'],park_sw['lng'])
+        dragonfly_count = pd.read_sql_query(dragonfly_query,con)
+        butterfly_count = pd.read_sql_query(butterfly_query,con)
+        print("butterfly count in park query")
+        print(butterfly_count)
+        print("dragonfly count in park query")
+        print(dragonfly_count)
 
     query = "SELECT date, count(*) from observations_table where butterfly_id='0' and date='%s' group by date order by date" %observe_date
     print(query)
