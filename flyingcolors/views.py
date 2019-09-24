@@ -88,8 +88,10 @@ def observations_input_simple():
 def observations_output():
     #pull 'date' from input field and store it
     observe_date = request.args.get('date')
+    observe_place = request.args.get('address')
     #get the count of observations from the date
     print(observe_date)
+    print(observe_place)
     query = "SELECT date, count(*) from observations_table where butterfly_id='0' and date='%s' group by date order by date" %observe_date
     print(query)
     query_results = pd.read_sql_query(query,con)
