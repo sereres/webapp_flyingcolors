@@ -6,6 +6,9 @@ from sqlalchemy_utils import database_exists, create_database
 import pandas as pd
 import psycopg2
 import pickle
+import urllib3
+import json
+http = urllib3.PoolManager()
 
 user = 'postgres'
 host = 'localhost'
@@ -92,6 +95,55 @@ def observations_output():
     #get the count of observations from the date
     print(observe_date)
     print(observe_place)
+
+    apikey_places = []
+    with open('flyingcolors/apikey1.txt', 'r') as file:
+        apikey_places = file.read()
+
+    apikey_places = []
+    with open('flyingcolors/apikey2.txt', 'r') as file:
+        apikey_geocode = file.read()
+
+    address_split = tuple(str(x) for x in observe_place.split(' '))
+    s="+"
+    formatted_address = s.join(address_split)
+
+    google_geocodeURLFormat = "https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s"
+    googlegeocodeURL = google_geocodeURLFormat % (formatted_address,apikey_geocode)
+    print("url = %s" % googlegeocodeURL)
+
+    request_address = http.request('GET',googlegeocodeURL)
+    jaddress = json.loads(request_address.data)
+    lattitude = jaddress['results'][0]['geometry']['location']['lat']
+    longitude = jaddress['results'][0]['geometry']['location']['lng']
+
+    googleplacesURL_format = "https://maps.googleapis.com/maps/api/place/search/json?location=%f,%f&key=%s&rankby=distance&types=park"
+    googleplacesURL = googleplacesURL_format % (lattitude,longitude,apikey_places)
+    print("url = %s" % googleplacesURL)
+
+    request_parks = http.request('GET',googleplacesURL)
+    jparks = json.loads(request_parks.data)
+
+    #j['results'][4]['geometry']['viewport']['northeast']
+    #j['results'][4]['geometry']['viewport']['southwest']
+    #millenium_park_count_test = """select count(*) from observations_table where lattitude < {} and 
+    #lattitude > {} and longitude < {} and longitude > {} and dragonfly_id='0'""".format(lat_ne,lat_sw,lon_ne,lon_sw)
+    #millenium_park_count_test = pd.read_sql_query(millenium_park_count_test,con)
+    #millenium_park_count_test.head()
+
+    parkcount = []
+
+    for park in j['results']:
+        #print(park)
+        park_ne = park['geometry']['viewport']['northeast']
+        park_sw = park['geometry']['viewport']['southwest']
+        print(park['name'])
+        dragonfly_query = """select count(*) from observations_table where lattitude < {} and 
+    #lattitude > {} and longitude < {} and longitude > {} and butterfly_id='0'""".format(park_ne['lat'],park_sw['lat'],park_ne['lng'],park_sw['lng'])
+        butterfly_query = """select count(*) from observations_table where lattitude < {} and 
+    #lattitude > {} and longitude < {} and longitude > {} and dragonfly_id='0'""".format(park_ne['lat'],park_sw['lat'],park_ne['lng'],park_sw['lng'])
+
+
     query = "SELECT date, count(*) from observations_table where butterfly_id='0' and date='%s' group by date order by date" %observe_date
     print(query)
     query_results = pd.read_sql_query(query,con)
