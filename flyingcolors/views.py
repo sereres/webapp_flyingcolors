@@ -266,6 +266,8 @@ def observations_output():
 
     for i in range(0,query_results.shape[0]):
         data.append(dict(date=query_results.iloc[i]['date'],count=query_results.iloc[i]['count']))
+
+    picture_ref = "https://i.imgur.com/vkuJXAq.jpg"
     return render_template("output.html", data=data, the_result=the_result, dragonfly_result=dragonfly_result, prevalent_species=prevalent_species, habitat_preference=habitat_preference, parkname1=parkname1, parkname2 = parkname2, parkname3=parkname3)
 
 
