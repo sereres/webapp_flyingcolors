@@ -10,6 +10,15 @@ import urllib3
 import json
 http = urllib3.PoolManager()
 
+from collections import OrderedDict
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import numpy as np
+from sklearn import metrics
+
+from geopy.distance import great_circle
+from shapely.geometry import MultiPoint
+
 user = 'postgres'
 host = 'localhost'
 dbname = 'observations'
@@ -40,11 +49,13 @@ def give_prediction_cluster(i):
        -0.06180867, -0.01777617, -0.05389357, -0.02757743, -0.03346074,
         0.03494131,  0.00904992]
     val = predicted_vals[i]
+    print("val is")
+    print(val)
     return val
 
 def get_prediction_butterfly(time,lat,lon):
-    pk2_climatefile = open('formatted_climate_data_2018-03_2019-08.pk1','rb')
-    climate_data = pickle.load(pk2_climatefile)
+    #pk2_climatefile = open('formatted_climate_data_2018-03_2019-08.pk1','rb')
+    #climate_data = pickle.load(pk2_climatefile)
 
     reference_point = [lat, lon]
     id_cluster = get_closest_cluster_id(reference_point)
@@ -240,7 +251,7 @@ def observations_output():
     parkname2 = "second placeholder"
     parkname3 = "third placeholder"
 
-    if predict_val > 2:
+    if predict_val < .2:
         parkname1 = sorted_dragonfly[0][3]
         parkname2 = sorted_dragonfly[1][3]
         parkname3 = sorted_dragonfly[2][3]
