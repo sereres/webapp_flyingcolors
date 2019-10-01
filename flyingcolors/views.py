@@ -157,6 +157,10 @@ def observations_output():
         park3_id = sorted_dragonfly[2][4]
         prevalent_species = "dragonflies"
         habitat_preference = " places near water, streambanks, ponds, and riverbanks"
+        pic1 = "ZN0uN93.jpg"
+        pic2 = "H4yzDIQ.jpg"
+        pic3 = "Wcl64cE.jpg"
+
     else:
         parkname1 = sorted_butterfly[0][3]
         park1_id = sorted_butterfly[0][4]
@@ -166,11 +170,14 @@ def observations_output():
         park3_id = sorted_butterfly[2][4]
         prevalent_species = "butterflies"
         habitat_preference = " places near large meadows of flowers and flowering trees"
+        pic1 = "bXqlviI.jpg"
+        pic2 = "SbbMftc.jpg"
+        pic3 = "qb9hq16.jpg"
 
 
 
     picture_ref = "https://i.imgur.com/vkuJXAq.jpg"
-    return render_template("output.html", prevalent_species=prevalent_species, habitat_preference=habitat_preference, parkname1=parkname1, parkname2 = parkname2, parkname3=parkname3, park1_id = park1_id, park2_id = park2_id, park3_id = park3_id)
+    return render_template("output.html", prevalent_species=prevalent_species, habitat_preference=habitat_preference, parkname1=parkname1, parkname2 = parkname2, parkname3=parkname3, park1_id = park1_id, park2_id = park2_id, park3_id = park3_id, pic1 = pic1, pic2 = pic2, pic3 = pic3)
 
 
 @app.route('/output_timeseries')
