@@ -90,7 +90,7 @@ def observations_output():
     parknumber = 0
 
     for park in jparks['results']:
-        #print(park)
+        park_place_id = park['place_id']
         park_ne = park['geometry']['viewport']['northeast']
         park_sw = park['geometry']['viewport']['southwest']
         print(park['name'])
@@ -109,18 +109,18 @@ def observations_output():
         print(butterfly_count)
         print("dragonfly count in park query")
         print(dragonfly_count)
-        entry = tuple((parknumber,dragonfly_count,butterfly_count,park['name']))
+        entry = tuple((parknumber,dragonfly_count,butterfly_count,park['name'],park_place_id))
         parkcount.append(entry)
         parknumber = parknumber + 1
 
     print("parkcount before sorting ")
     print(parkcount)
 
-    #the below is how to sort a tuple based on the index key. for dragonfly sort, use 2, for butterfly sort, use 1.
+    #the below is how to sort a tuple based on the index key. for dragonfly sort, use 1, for butterfly sort, use 2.
     #sorts in increasing order though.
     #sorted(tuples, key = last) 
-    sorted_dragonfly_increasing = sorted(parkcount,key = lambda x: x[2])
-    sorted_butterfly_increasing = sorted(parkcount,key = lambda x: x[1])
+    sorted_dragonfly_increasing = sorted(parkcount,key = lambda x: x[1])
+    sorted_butterfly_increasing = sorted(parkcount,key = lambda x: x[2])
     print("parkcount sorted ")
     print(sorted_butterfly_increasing)
 
@@ -142,26 +142,35 @@ def observations_output():
     prevalent_species = "boo"
     habitat_preference = "foo"
     parkname1 = "first placeholder"
+    park1_id = "placeholder"
     parkname2 = "second placeholder"
+    park2_id = "placeholder"
     parkname3 = "third placeholder"
+    park3_id = "placeholder"
 
     if prediction==1:
         parkname1 = sorted_dragonfly[0][3]
+        park1_id = sorted_dragonfly[0][4]
         parkname2 = sorted_dragonfly[1][3]
+        park2_id = sorted_dragonfly[1][4]
         parkname3 = sorted_dragonfly[2][3]
+        park3_id = sorted_dragonfly[2][4]
         prevalent_species = "dragonflies"
         habitat_preference = " places near water, streambanks, ponds, and riverbanks"
     else:
         parkname1 = sorted_butterfly[0][3]
+        park1_id = sorted_butterfly[0][4]
         parkname2 = sorted_butterfly[1][3]
+        park2_id = sorted_butterfly[1][4]
         parkname3 = sorted_butterfly[2][3]
+        park3_id = sorted_butterfly[2][4]
         prevalent_species = "butterflies"
         habitat_preference = " places near large meadows of flowers and flowering trees"
 
 
 
     picture_ref = "https://i.imgur.com/vkuJXAq.jpg"
-    return render_template("output.html", prevalent_species=prevalent_species, habitat_preference=habitat_preference, parkname1=parkname1, parkname2 = parkname2, parkname3=parkname3)
+    return render_template("output.html", prevalent_species=prevalent_species, habitat_preference=habitat_preference, parkname1=parkname1, parkname2 = parkname2, parkname3=parkname3, park1_id = park1_id, park2_id = park2_id, park3_id = park3_id)
 
 
 @app.route('/output_timeseries')
